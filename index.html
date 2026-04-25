@@ -9,6 +9,7 @@ body {
   margin: 0;
   background: black;
   font-family: sans-serif;
+  font-weight: normal; /* ensure not bold */
 }
 
 #start {
@@ -54,16 +55,21 @@ img {
   transform: translate(-50%, -50%);
 }
 
-/* Text under spinner */
+/* Text UNDER spinner */
 #text {
   position: absolute;
-  top: 60%;
   left: 50%;
   transform: translateX(-50%);
   color: white;
   text-align: center;
   display: none;
   font-size: 14px;
+  margin-top: 10px;
+}
+
+/* when centered, place text below spinner */
+.center + #text {
+  top: calc(50% + 40px);
 }
 </style>
 </head>
@@ -94,13 +100,11 @@ start.onclick = () => {
 
   setTimeout(() => document.body.style.background = "#cc5500", 28000);
 
-  // Spinner centered
   setTimeout(() => {
     spin.style.display = "block";
     spin.classList.add("center");
   }, 30000);
 
-  // +1s → show text (31s)
   setTimeout(() => {
     text.style.display = "block";
   }, 31000);
