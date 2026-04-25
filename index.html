@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Windows 1E</title>
+<link rel="icon" href="logo.ico">
+<style>
+body {
+  margin: 0;
+  background: black;
+  font-family: sans-serif;
+}
+
+#start {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  color: white;
+  background: black;
+  border: 1px solid white;
+  padding: 5px 8px;
+  cursor: pointer;
+}
+
+#boot {
+  display: none;
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+}
+
+img {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: none;
+}
+
+#logo { top: 12%; }
+#spin { bottom: 12%; }
+.center {
+  top: 50% !important;
+  bottom: auto !important;
+  transform: translate(-50%, -50%);
+}
+</style>
+</head>
+
+<body>
+
+<button id="start">Click to start</button>
+
+<div id="boot">
+  <img id="logo" src="logo.png">
+  <img id="spin" src="loading_spinner.gif">
+</div>
+
+<script>
+start.onclick = () => {
+  start.style.display = "none";
+  boot.style.display = "block";
+
+  setTimeout(() => logo.style.display = "block", 3000);
+  setTimeout(() => spin.style.display = "block", 6000);
+
+  setTimeout(() => logo.style.display = "none", 16000);
+  setTimeout(() => spin.style.display = "none", 26000);
+
+  // +2s → background orange (28s)
+  setTimeout(() => document.body.style.background = "#cc5500", 28000);
+
+  // +2s → spinner center (30s)
+  setTimeout(() => {
+    spin.style.display = "block";
+    spin.classList.add("center");
+  }, 30000);
+};
+</script>
+
+</body>
+</html>
