@@ -36,7 +36,7 @@ img {
   display: none;
 }
 
-/* Smaller sizes */
+/* Sizes */
 #logo {
   top: 12%;
   width: 140px;
@@ -47,11 +47,23 @@ img {
   width: 60px;
 }
 
-/* Centered spinner at end */
+/* Center spinner */
 .center {
   top: 50% !important;
   bottom: auto !important;
   transform: translate(-50%, -50%);
+}
+
+/* Text under spinner */
+#text {
+  position: absolute;
+  top: 60%;
+  left: 50%;
+  transform: translateX(-50%);
+  color: white;
+  text-align: center;
+  display: none;
+  font-size: 14px;
 }
 </style>
 </head>
@@ -63,6 +75,10 @@ img {
 <div id="boot">
   <img id="logo" src="logo.png">
   <img id="spin" src="loading_spinner.gif">
+  <div id="text">
+    Updates are on your way.<br>
+    Please do not unplug your PC.
+  </div>
 </div>
 
 <script>
@@ -70,26 +86,24 @@ start.onclick = () => {
   start.style.display = "none";
   boot.style.display = "block";
 
-  // 3s → logo appears
   setTimeout(() => logo.style.display = "block", 3000);
-
-  // 6s → spinner appears
   setTimeout(() => spin.style.display = "block", 6000);
 
-  // 16s → logo disappears
   setTimeout(() => logo.style.display = "none", 16000);
-
-  // 26s → spinner disappears
   setTimeout(() => spin.style.display = "none", 26000);
 
-  // 28s → dark orange background
   setTimeout(() => document.body.style.background = "#cc5500", 28000);
 
-  // 30s → spinner comes back in center
+  // Spinner centered
   setTimeout(() => {
     spin.style.display = "block";
     spin.classList.add("center");
   }, 30000);
+
+  // +1s → show text (31s)
+  setTimeout(() => {
+    text.style.display = "block";
+  }, 31000);
 };
 </script>
 
