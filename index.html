@@ -3,6 +3,7 @@
 <head>
 <title>Windows 1E</title>
 <link rel="icon" href="logo.ico">
+
 <style>
 body {
   margin: 0;
@@ -35,6 +36,65 @@ img {
   display: none;
 }
 
+/* Smaller sizes */
+#logo {
+  top: 12%;
+  width: 140px;
+}
+
+#spin {
+  bottom: 12%;
+  width: 60px;
+}
+
+/* Centered spinner at end */
+.center {
+  top: 50% !important;
+  bottom: auto !important;
+  transform: translate(-50%, -50%);
+}
+</style>
+</head>
+
+<body>
+
+<button id="start">Click to start</button>
+
+<div id="boot">
+  <img id="logo" src="logo.png">
+  <img id="spin" src="loading_spinner.gif">
+</div>
+
+<script>
+start.onclick = () => {
+  start.style.display = "none";
+  boot.style.display = "block";
+
+  // 3s → logo appears
+  setTimeout(() => logo.style.display = "block", 3000);
+
+  // 6s → spinner appears
+  setTimeout(() => spin.style.display = "block", 6000);
+
+  // 16s → logo disappears
+  setTimeout(() => logo.style.display = "none", 16000);
+
+  // 26s → spinner disappears
+  setTimeout(() => spin.style.display = "none", 26000);
+
+  // 28s → dark orange background
+  setTimeout(() => document.body.style.background = "#cc5500", 28000);
+
+  // 30s → spinner comes back in center
+  setTimeout(() => {
+    spin.style.display = "block";
+    spin.classList.add("center");
+  }, 30000);
+};
+</script>
+
+</body>
+</html>
 #logo { top: 12%; }
 #spin { bottom: 12%; }
 .center {
