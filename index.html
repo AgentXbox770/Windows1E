@@ -3,77 +3,64 @@
 <head>
 <title>Windows 1E</title>
 <link rel="icon" href="logo.ico">
-
 <style>
-body {
-  margin: 0;
-  background: black;
-  font-family: sans-serif;
-  font-weight: normal; /* ensure not bold */
-}
+  body {
+    margin: 0;
+    background: black;
+    font-family: sans-serif;
+    overflow: hidden; /* Prevent scrollbars */
+  }
 
-#start {
-  position: absolute;
-  top: 5px;
-  left: 5px;
-  color: white;
-  background: black;
-  border: 1px solid white;
-  padding: 5px 8px;
-  cursor: pointer;
-}
+  #start {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    color: white;
+    background: black;
+    border: 1px solid white;
+    padding: 5px 8px;
+    cursor: pointer;
+    z-index: 100;
+  }
 
-#boot {
-  display: none;
-  width: 100vw;
-  height: 100vh;
-  position: relative;
-}
+  #boot {
+    display: none;
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+  }
 
-img {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  display: none;
-}
+  img {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+  }
 
-/* Sizes */
-#logo {
-  top: 12%;
-  width: 140px;
-}
+  /* Initial Boot Sizes */
+  #logo {
+    top: 12%;
+    width: 140px;
+  }
 
-#spin {
-  bottom: 12%;
-  width: 60px;
-}
+  #spin {
+    bottom: 12%;
+    width: 60px;
+  }
 
-/* Center spinner */
-.center {
-  top: 50% !important;
-  bottom: auto !important;
-  transform: translate(-50%, -50%);
-}
-
-/* Text UNDER spinner */
-#text {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  color: white;
-  text-align: center;
-  display: none;
-  font-size: 14px;
-  margin-top: 10px;
-}
-
-/* when centered, place text below spinner */
-.center + #text {
-  top: calc(50% + 40px);
-}
+  /* Text Styling */
+  #text {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    text-align: center;
+    display: none;
+    font-size: 14px;
+    font-weight: normal;
+  }
 </style>
 </head>
-
 <body>
 
 <button id="start">Click to start</button>
@@ -92,22 +79,80 @@ start.onclick = () => {
   start.style.display = "none";
   boot.style.display = "block";
 
+  // Initial boot sequence
   setTimeout(() => logo.style.display = "block", 3000);
   setTimeout(() => spin.style.display = "block", 6000);
 
   setTimeout(() => logo.style.display = "none", 16000);
   setTimeout(() => spin.style.display = "none", 26000);
 
-  setTimeout(() => document.body.style.background = "#cc5500", 28000);
+  // Transition to Orange Screen
+  setTimeout(() => {
+    document.body.style.background = "#cc5500";
+  }, 28000);
 
+  // Spinner appears in center
   setTimeout(() => {
     spin.style.display = "block";
-    spin.classList.add("center");
+    // FORCE CENTER VIA JS
+    spin.style.bottom = "auto"; 
+    spin.style.top = "50%";
+    spin.style.left = "50%";
+    spin.style.transform = "translate(-50%, -50%)";
   }, 30000);
 
+  // Text appears below centered spinner
   setTimeout(() => {
     text.style.display = "block";
+    text.style.top = "calc(50% + 50px)";
   }, 31000);
+
+  // Change text to "No updates found"
+  setTimeout(() => {
+    text.innerHTML = "No updates found.";
+  }, 34000);
+
+  // Spinner and text disappear
+  setTimeout(() => {
+    spin.style.display = "none";
+    text.style.display = "none";
+  }, 35000);
+
+  // Change to wallpaper
+  setTimeout(() => {
+    document.body.style.background = "url('loginscreenwallpaper1.png') no-repeat center center fixed";
+    document.body.style.backgroundSize = "cover";
+  }, 37000);
+
+  // Clock and Date Display
+  setTimeout(() => {
+    const now = new Date();
+    
+    const clockContainer = document.createElement("div");
+    clockContainer.style.position = "absolute";
+    clockContainer.style.bottom = "50px";
+    clockContainer.style.left = "50px";
+    clockContainer.style.color = "white";
+    
+    // Time: Large and White
+    const timeDisplay = document.createElement("div");
+    timeDisplay.style.fontSize = "90px";
+    timeDisplay.style.fontWeight = "100";
+    timeDisplay.innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+
+    // Date: Small and Grey
+    const dateDisplay = document.createElement("div");
+    dateDisplay.style.fontSize = "22px";
+    dateDisplay.style.color = "#cccccc"; 
+    
+    const options = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
+    // Format: Day, Month Date, Year
+    dateDisplay.innerText = now.toLocaleDateString(undefined, options);
+
+    clockContainer.appendChild(timeDisplay);
+    clockContainer.appendChild(dateDisplay);
+    document.body.appendChild(clockContainer);
+  }, 38000);
 };
 </script>
 
