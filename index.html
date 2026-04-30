@@ -8,152 +8,198 @@
     margin: 0;
     background: black;
     font-family: sans-serif;
-    overflow: hidden; /* Prevent scrollbars */
+    overflow: hidden;
+    transition: background 0.5s ease;
+  }
+
+  #bg-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    transition: filter 0.5s ease;
   }
 
   #start {
     position: absolute;
-    top: 5px;
-    left: 5px;
-    color: white;
-    background: black;
-    border: 1px solid white;
-    padding: 5px 8px;
-    cursor: pointer;
-    z-index: 100;
+    top: 5px; left: 5px;
+    color: white; background: black;
+    border: 1px solid white; padding: 5px 8px;
+    cursor: pointer; z-index: 100;
   }
 
   #boot {
     display: none;
-    width: 100vw;
-    height: 100vh;
+    width: 100vw; height: 100vh;
     position: relative;
   }
 
-  img {
+  #logo { 
     position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    display: none;
+    left: 50%; transform: translateX(-50%);
+    top: 12%; width: 140px; display: none;
   }
 
-  /* Initial Boot Sizes */
-  #logo {
-    top: 12%;
-    width: 140px;
+  #spin { 
+    position: absolute;
+    left: 50%; transform: translateX(-50%);
+    bottom: 12%; width: 60px; display: none;
   }
 
-  #spin {
-    bottom: 12%;
-    width: 60px;
-  }
-
-  /* Text Styling */
   #text {
     position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 50%; transform: translateX(-50%);
+    color: white; text-align: center;
+    display: none; font-size: 14px;
+  }
+
+  #clock-container {
+    position: absolute;
+    bottom: 50px;
+    left: 50px;
     color: white;
+    transition: transform 0.6s cubic-bezier(0.1, 0.9, 0.2, 1), opacity 0.5s;
+    pointer-events: none;
+  }
+
+  .swipe-up {
+    transform: translateY(-100vh);
+    opacity: 0;
+  }
+
+  /* Login Screen UI */
+  #login-ui {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
     text-align: center;
     display: none;
-    font-size: 14px;
-    font-weight: normal;
+    color: white;
+  }
+
+  #pfp {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    display: block;
+    margin: 0 auto 30px auto; 
+    object-fit: cover;
+  }
+
+  .login-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  #login-spin {
+    width: 28px;
+    height: 28px;
+  }
+
+  .status-text {
+    font-size: 22px;
+    font-weight: 300;
   }
 </style>
 </head>
 <body>
 
+<div id="bg-overlay"></div>
 <button id="start">Click to start</button>
 
 <div id="boot">
   <img id="logo" src="logo.png">
   <img id="spin" src="loading_spinner.gif">
-  <div id="text">
-    Updates are on your way.<br>
-    Please do not unplug your PC.
+  <div id="text">Updates are on your way.<br>Please do not unplug your PC.</div>
+</div>
+
+<div id="clock-container"></div>
+
+<div id="login-ui">
+  <img id="pfp" src="defaultpfp1.png">
+  <div class="login-status">
+    <img id="login-spin" src="loading_spinner.gif">
+    <span class="status-text">Preparing Windows</span>
   </div>
 </div>
 
 <script>
+const bg = document.getElementById('bg-overlay');
+const clockBox = document.getElementById('clock-container');
+const loginUI = document.getElementById('login-ui');
+const spin = document.getElementById('spin');
+const logo = document.getElementById('logo');
+const text = document.getElementById('text');
+
 start.onclick = () => {
   start.style.display = "none";
   boot.style.display = "block";
 
-  // Initial boot sequence
   setTimeout(() => logo.style.display = "block", 3000);
   setTimeout(() => spin.style.display = "block", 6000);
-
   setTimeout(() => logo.style.display = "none", 16000);
   setTimeout(() => spin.style.display = "none", 26000);
 
-  // Transition to Orange Screen
-  setTimeout(() => {
-    document.body.style.background = "#cc5500";
-  }, 28000);
+  setTimeout(() => bg.style.background = "#cc5500", 28000);
 
-  // Spinner appears in center
   setTimeout(() => {
     spin.style.display = "block";
-    // FORCE CENTER VIA JS
     spin.style.bottom = "auto"; 
     spin.style.top = "50%";
     spin.style.left = "50%";
     spin.style.transform = "translate(-50%, -50%)";
   }, 30000);
 
-  // Text appears below centered spinner
   setTimeout(() => {
     text.style.display = "block";
     text.style.top = "calc(50% + 50px)";
   }, 31000);
 
-  // Change text to "No updates found"
-  setTimeout(() => {
-    text.innerHTML = "No updates found.";
-  }, 34000);
+  setTimeout(() => { text.innerHTML = "No updates found."; }, 34000);
 
-  // Spinner and text disappear
   setTimeout(() => {
     spin.style.display = "none";
     text.style.display = "none";
   }, 35000);
 
-  // Change to wallpaper
   setTimeout(() => {
-    document.body.style.background = "url('loginscreenwallpaper1.png') no-repeat center center fixed";
-    document.body.style.backgroundSize = "cover";
+    bg.style.background = "url('loginscreenwallpaper1.png') no-repeat center center fixed";
+    bg.style.backgroundSize = "cover";
+    document.body.style.cursor = "pointer";
+    document.body.onclick = swipeUp;
   }, 37000);
 
-  // Clock and Date Display
   setTimeout(() => {
     const now = new Date();
+    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     
-    const clockContainer = document.createElement("div");
-    clockContainer.style.position = "absolute";
-    clockContainer.style.bottom = "50px";
-    clockContainer.style.left = "50px";
-    clockContainer.style.color = "white";
-    
-    // Time: Large and White
-    const timeDisplay = document.createElement("div");
-    timeDisplay.style.fontSize = "90px";
-    timeDisplay.style.fontWeight = "100";
-    timeDisplay.innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
-
-    // Date: Small and Grey
-    const dateDisplay = document.createElement("div");
-    dateDisplay.style.fontSize = "22px";
-    dateDisplay.style.color = "#cccccc"; 
-    
-    const options = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
-    // Format: Day, Month Date, Year
-    dateDisplay.innerText = now.toLocaleDateString(undefined, options);
-
-    clockContainer.appendChild(timeDisplay);
-    clockContainer.appendChild(dateDisplay);
-    document.body.appendChild(clockContainer);
+    clockBox.innerHTML = `
+      <div style="font-size:90px; font-weight:100; line-height:1;">
+        ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}
+      </div>
+      <div style="font-size:22px; color:#cccccc; margin-top:10px;">
+        ${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}
+      </div>
+    `;
   }, 38000);
 };
+
+function swipeUp() {
+  document.body.onclick = null;
+  document.body.style.cursor = "default";
+  
+  clockBox.classList.add('swipe-up');
+  bg.style.filter = "blur(30px) brightness(0.7)";
+  
+  setTimeout(() => {
+    loginUI.style.display = "block";
+  }, 400);
+}
 </script>
 
 </body>
