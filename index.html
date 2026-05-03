@@ -4,106 +4,76 @@
 <title>Windows 1E</title>
 <link rel="icon" href="logo.ico">
 <style>
-  body {
-    margin: 0;
-    background: black;
-    font-family: sans-serif;
-    overflow: hidden;
-    transition: background 0.5s ease;
-  }
-
+  body { margin: 0; background: black; font-family: sans-serif; overflow: hidden; }
+  
   #bg-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: -1;
-    transition: filter 0.5s ease;
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    z-index: -1; transition: filter 0.5s ease, background 0.5s ease;
   }
 
   #start {
-    position: absolute;
-    top: 5px; left: 5px;
-    color: white; background: black;
-    border: 1px solid white; padding: 5px 8px;
-    cursor: pointer; z-index: 100;
+    position: absolute; top: 5px; left: 5px; color: white; background: black;
+    border: 1px solid white; padding: 5px 8px; cursor: pointer; z-index: 100;
   }
 
-  #boot {
-    display: none;
-    width: 100vw; height: 100vh;
-    position: relative;
-  }
-
-  #logo { 
-    position: absolute;
-    left: 50%; transform: translateX(-50%);
-    top: 12%; width: 140px; display: none;
-  }
-
-  #spin { 
-    position: absolute;
-    left: 50%; transform: translateX(-50%);
-    bottom: 12%; width: 60px; display: none;
-  }
-
-  #text {
-    position: absolute;
-    left: 50%; transform: translateX(-50%);
-    color: white; text-align: center;
-    display: none; font-size: 14px;
-  }
+  #boot, #login-ui { display: none; }
+  
+  #logo { position: absolute; left: 50%; transform: translateX(-50%); top: 12%; width: 140px; display: none; }
+  #spin { position: absolute; left: 50%; transform: translateX(-50%); bottom: 12%; width: 60px; display: none; }
+  #text { position: absolute; left: 50%; transform: translateX(-50%); color: white; text-align: center; display: none; font-size: 14px; }
 
   #clock-container {
-    position: absolute;
-    bottom: 50px;
-    left: 50px;
-    color: white;
+    position: absolute; bottom: 50px; left: 50px; color: white;
     transition: transform 0.6s cubic-bezier(0.1, 0.9, 0.2, 1), opacity 0.5s;
     pointer-events: none;
   }
+  .swipe-up { transform: translateY(-100vh); opacity: 0; }
 
-  .swipe-up {
-    transform: translateY(-100vh);
-    opacity: 0;
-  }
-
-  /* Login Screen UI */
   #login-ui {
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-    display: none;
-    color: white;
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    text-align: center; color: white;
+  }
+  #pfp { width: 150px; height: 150px; border-radius: 50%; margin-bottom: 30px; object-fit: cover; }
+  .login-status { display: flex; align-items: center; justify-content: center; gap: 12px; }
+  #login-spin { width: 28px; height: 28px; }
+
+  /* Desktop and Taskbar */
+  #desktop {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    display: none; opacity: 0; transition: opacity 0.8s ease;
+    background: url('wallpaper1.png') no-repeat center center;
+    background-size: cover;
   }
 
-  #pfp {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    display: block;
-    margin: 0 auto 30px auto; 
-    object-fit: cover;
+  #taskbar {
+    position: absolute; bottom: 0; width: 100%; height: 40px;
+    background: rgba(0, 0, 0, 0.85); display: flex; align-items: center; justify-content: space-between;
   }
 
-  .login-status {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
+  .taskbar-left { display: flex; align-items: center; height: 100%; }
+  
+  .tb-icon { height: 100%; padding: 0 12px; display: flex; align-items: center; transition: background 0.2s; }
+  .tb-icon img { position: static; transform: none; display: block; width: 20px; height: 20px; }
+
+  /* Hover Effects */
+  #start-icon-container:hover { background: rgba(255, 255, 255, 0.1); }
+  #start-icon-container:hover img { content: url('hovered_startmenuicon.png'); }
+  
+  #cortana-container:hover { background: rgba(255, 255, 255, 0.1); }
+  #cortana-container:hover img { content: url('hovered_cortana.png'); }
+
+  .taskbar-right {
+    color: white; padding-right: 15px; font-size: 12px; text-align: right; line-height: 1.2;
   }
 
-  #login-spin {
-    width: 28px;
-    height: 28px;
-  }
+#search-container:hover { 
+  background: rgba(255, 255, 255, 0.1); 
+}
 
-  .status-text {
-    font-size: 22px;
-    font-weight: 300;
-  }
+#search-container:hover img { 
+  content: url('hovered_search.png'); 
+}
+
 </style>
 </head>
 <body>
@@ -123,7 +93,18 @@
   <img id="pfp" src="defaultpfp1.png">
   <div class="login-status">
     <img id="login-spin" src="loading_spinner.gif">
-    <span class="status-text">Preparing Windows</span>
+    <span style="font-size: 22px; font-weight: 300;">Preparing Windows</span>
+  </div>
+</div>
+
+<div id="desktop">
+  <div id="taskbar">
+    <div class="taskbar-left">
+      <div class="tb-icon" id="start-icon-container"><img src="startmenuicon.png"></div>
+      <div class="tb-icon" id="cortana-container"><img src="cortana.png"></div>
+      <div class="tb-icon" id="search-container"><img src="search.png"></div>
+    </div>
+    <div class="taskbar-right" id="tb-time"></div>
   </div>
 </div>
 
@@ -131,26 +112,23 @@
 const bg = document.getElementById('bg-overlay');
 const clockBox = document.getElementById('clock-container');
 const loginUI = document.getElementById('login-ui');
+const desktop = document.getElementById('desktop');
 const spin = document.getElementById('spin');
 const logo = document.getElementById('logo');
 const text = document.getElementById('text');
 
 start.onclick = () => {
   start.style.display = "none";
-  boot.style.display = "block";
-
+  document.getElementById('boot').style.display = "block";
   setTimeout(() => logo.style.display = "block", 3000);
   setTimeout(() => spin.style.display = "block", 6000);
   setTimeout(() => logo.style.display = "none", 16000);
   setTimeout(() => spin.style.display = "none", 26000);
-
   setTimeout(() => bg.style.background = "#cc5500", 28000);
 
   setTimeout(() => {
     spin.style.display = "block";
-    spin.style.bottom = "auto"; 
-    spin.style.top = "50%";
-    spin.style.left = "50%";
+    spin.style.bottom = "auto"; spin.style.top = "50%"; spin.style.left = "50%";
     spin.style.transform = "translate(-50%, -50%)";
   }, 30000);
 
@@ -174,33 +152,48 @@ start.onclick = () => {
   }, 37000);
 
   setTimeout(() => {
-    const now = new Date();
-    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-    const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-    
-    clockBox.innerHTML = `
-      <div style="font-size:90px; font-weight:100; line-height:1;">
-        ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}
-      </div>
-      <div style="font-size:22px; color:#cccccc; margin-top:10px;">
-        ${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}
-      </div>
-    `;
+    updateClock();
+    setInterval(updateClock, 1000);
   }, 38000);
 };
+
+function updateClock() {
+  const now = new Date();
+  const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  
+  clockBox.innerHTML = `
+    <div style="font-size:90px; font-weight:100; line-height:1;">
+      ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}
+    </div>
+    <div style="font-size:22px; color:#cccccc; margin-top:10px;">
+      ${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}
+    </div>
+  `;
+  
+  // Format MM/DD/YYYY for taskbar
+  const tbDate = `${(now.getMonth()+1)}/${now.getDate()}/${now.getFullYear()}`;
+  const tbTime = `${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
+  document.getElementById('tb-time').innerHTML = `<div>${tbTime}</div><div>${tbDate}</div>`;
+}
 
 function swipeUp() {
   document.body.onclick = null;
   document.body.style.cursor = "default";
-  
   clockBox.classList.add('swipe-up');
   bg.style.filter = "blur(30px) brightness(0.7)";
   
+  setTimeout(() => { loginUI.style.display = "block"; }, 400);
+
+  // Transition to Desktop in 5 seconds
   setTimeout(() => {
-    loginUI.style.display = "block";
-  }, 400);
+    loginUI.style.display = "none";
+    desktop.style.display = "block";
+    setTimeout(() => { desktop.style.opacity = "1"; }, 50);
+  }, 5000);
 }
 </script>
 
 </body>
 </html>
+
