@@ -66,6 +66,30 @@
     color: white; padding-right: 15px; font-size: 12px; text-align: right; line-height: 1.2;
   }
 
+  /* The Cortana Window */
+  #cortana-window {
+    position: absolute; 
+    bottom: 40px; /* Sits right on top of the taskbar */
+    left: 0; 
+    width: 300px; 
+    height: 450px;
+    background: #111; 
+    border: 1px solid #333; 
+    display: none; /* Hidden until you click the icon */
+    flex-direction: column; 
+    color: white;
+    z-index: 5000;
+  }
+  .win-header { padding: 10px; display: flex; align-items: center; gap: 10px; font-size: 12px; }
+  .win-header img { width: 14px; }
+  .win-content { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; }
+  
+  .blue-text { color: #0078d4; font-size: 18px; margin-bottom: 15px; text-align: center; }
+  .learn-btn { background: white; color: black; border: none; padding: 10px 20px; cursor: pointer; }
+
+  /* This highlights the icon when clicked */
+  .active { background: rgba(255,255,255,0.2) !important; }
+
 #search-container:hover { 
   background: rgba(255, 255, 255, 0.1); 
 }
@@ -73,6 +97,74 @@
 #search-container:hover img { 
   content: url('hovered_search.png'); 
 }
+
+/* Windows 10 Style Notification */
+#notification {
+  position: absolute;
+  bottom: 50px; /* Sits just above the taskbar */
+  right: -400px; /* Hidden off-screen by default */
+  width: 360px;
+  background: #1f1f1f;
+  border: 1px solid #333;
+  color: white;
+  padding: 15px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+  transition: right 0.4s cubic-bezier(0.1, 0.9, 0.2, 1);
+  z-index: 9999;
+  display: flex;
+  gap: 15px;
+}
+
+/* Slide-in state */
+#notification.show {
+  right: 10px;
+}
+
+.notif-icon {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+}
+
+.notif-icon img {
+  width: 100%;
+  height: 100%;
+  position: static;
+  transform: none;
+  display: block;
+}
+
+.notif-body {
+  flex-grow: 1;
+}
+
+.notif-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.notif-text {
+  font-size: 12px;
+  color: #cccccc;
+  margin-bottom: 12px;
+}
+
+.notif-btn {
+  background: #333;
+  color: white;
+  border: 1px solid #555;
+  padding: 6px 24px;
+  cursor: pointer;
+  font-size: 12px;
+  float: right;
+}
+
+.notif-btn:hover {
+  background: #444;
+  border-color: #666;
+}
+
 
 </style>
 </head>
@@ -98,16 +190,43 @@
 </div>
 
 <div id="desktop">
+
+  <!-- Windows 10 Notification Popup (Placed safely inside desktop) -->
+  <div id="notification">
+    <div class="notif-icon">
+      <img src="checkmark_popup.png">
+    </div>
+    <div class="notif-body">
+      <div class="notif-title">New updates installed.</div>
+      <div class="notif-text">You are on the latest version of Windows 1E.</div>
+      <button class="notif-btn" id="notif-ok">OK</button>
+    </div>
+  </div>
+
+  <div id="cortana-window">
+    <div class="win-header">
+      <img src="cortana.png">
+      <span>Cortana</span>
+    </div>
+    <div class="win-content">
+      <div class="blue-text">Cortana is no longer supported.</div>
+      <button class="learn-btn" onclick="window.open('https://support.microsoft.com/en-us/topic/end-of-support-for-cortana-in-windows-and-microsoft-365-d016911c-6d9b-4654-a31a-e906c278bc2b')">Learn more</button>
+    </div>
+  </div>
+
   <div id="taskbar">
     <div class="taskbar-left">
       <div class="tb-icon" id="start-icon-container"><img src="startmenuicon.png"></div>
-      <div class="tb-icon" id="cortana-container"><img src="cortana.png"></div>
       <div class="tb-icon" id="search-container"><img src="search.png"></div>
+      <div class="tb-icon" id="cortana-container"><img src="cortana.png"></div>
     </div>
     <div class="taskbar-right" id="tb-time"></div>
   </div>
+
 </div>
 
+
+</body>
 <script>
 const bg = document.getElementById('bg-overlay');
 const clockBox = document.getElementById('clock-container');
@@ -185,15 +304,54 @@ function swipeUp() {
   
   setTimeout(() => { loginUI.style.display = "block"; }, 400);
 
-  // Transition to Desktop in 5 seconds
+  // Enter Desktop Phase after 5 seconds
   setTimeout(() => {
     loginUI.style.display = "none";
     desktop.style.display = "block";
-    setTimeout(() => { desktop.style.opacity = "1"; }, 50);
+    desktop.style.opacity = "0";
+    
+    setTimeout(() => { 
+      desktop.style.opacity = "1"; 
+      
+      // --- NEW: Trigger notification 3 seconds after desktop is fully visible ---
+      setTimeout(() => {
+        const notif = document.getElementById('notification');
+        notif.classList.add('show');
+        
+        // Make OK button slide the notification back off-screen
+        document.getElementById('notif-ok').onclick = () => {
+          notif.classList.remove('show');
+        };
+      }, 3000);
+      
+    }, 100);
   }, 5000);
 }
+
+let isOpen = false;
+const corWindow = document.getElementById('cortana-window');
+const corContainer = document.getElementById('cortana-container');
+const corImg = corContainer.querySelector('img');
+
+corContainer.onclick = (e) => {
+  e.stopPropagation(); // Stop the click from hitting the desktop
+  isOpen = !isOpen; // Flip the switch
+
+  if(isOpen) {
+    corWindow.style.display = "flex";
+    corContainer.classList.add('active');
+    corImg.src = "clicked_cortana.png"; // Icon stays highlighted
+  } else {
+    // Run the close function
+    isOpen = false;
+    corWindow.style.display = "none";
+    corContainer.classList.remove('active');
+    corImg.src = "cortana.png"; // Back to normal
+  }
+};
+
+
 </script>
 
 </body>
 </html>
-
